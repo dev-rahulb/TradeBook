@@ -12,7 +12,7 @@ class JournalModel extends Model
         'date', 'stock', 'stop_loss', 'target',
         'buy_time', 'sell_time', 'buy_price', 'sell_price',
         'quantity', 'qty_of_trades', 'pnl', 'rating',
-        'entry_reason', 'exit_reason', 'mistake', 'lessons', 'user_id'
+        'entry_reason', 'exit_reason', 'mistake', 'lessons', 'user_id','calmness' ,'strategy_type',
     ];
 
     // ✅ Enable soft deletes

@@ -32,6 +32,7 @@ class Journal extends BaseController
 
    public function store()
 {
+  
     $this->journal->save([
         'user_id'         => session()->get('user_id'),
         'date'            => $this->request->getPost('date'),
@@ -48,6 +49,8 @@ class Journal extends BaseController
         'exit_reason'     => $this->request->getPost('exit_reason'),
         'mistake'         => $this->request->getPost('mistake'),
         'lessons'  => $this->request->getPost('lesson'),
+        'strategy_type' => $this->request->getPost('strategy_type'),
+        'calmness' => $this->request->getPost('calmness'),
     ]);
 
     return redirect()->to('/journal')->with('message', 'Entry added successfully.');
@@ -87,6 +90,8 @@ class Journal extends BaseController
         'exit_reason'     => $this->request->getPost('exit_reason'),
         'mistake'         => $this->request->getPost('mistake'),
         'lessons'  => $this->request->getPost('lesson'),
+        'strategy_type' => $this->request->getPost('strategy_type'),
+           'calmness' => $this->request->getPost('calmness'),
         ]);
 
         return redirect()->to('/journal')->with('message', 'Entry updated successfully.');

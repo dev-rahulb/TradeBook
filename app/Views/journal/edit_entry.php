@@ -18,6 +18,33 @@
         <input type="text" name="stock" class="form-control" value="<?= esc($entry['stock']) ?>" required>
         <div class="invalid-feedback">Stock name is required.</div>
       </div>
+<div class="col-md-3">
+  <label for="strategy_type" class="form-label">Strategy Type</label>
+  <select name="strategy_type" id="strategy_type" class="form-select" required>
+    <option value="" disabled>-- Select Strategy --</option>
+    <option value="Breakout" <?= $entry['strategy_type'] == 'Breakout' ? 'selected' : '' ?>>Breakout</option>
+    <option value="Reversal" <?= $entry['strategy_type'] == 'Reversal' ? 'selected' : '' ?>>Reversal</option>
+    <option value="Scalping" <?= $entry['strategy_type'] == 'Scalping' ? 'selected' : '' ?>>Scalping</option>
+    <option value="Range Bound" <?= $entry['strategy_type'] == 'Range Bound' ? 'selected' : '' ?>>Range Bound</option>
+    <option value="News Based" <?= $entry['strategy_type'] == 'News Based' ? 'selected' : '' ?>>News Based</option>
+    <option value="Other" <?= $entry['strategy_type'] == 'Other' ? 'selected' : '' ?>>Other</option>
+  </select>
+</div>
+<div class="col-md-3">
+  <label for="calmness" class="form-label">Calmness (%)</label>
+  <select name="calmness" id="calmness" class="form-select" required>
+    <option value="" disabled>-- How Calm Were You? --</option>
+    <?php
+      for ($i = 100; $i >= 0; $i -= 10):
+        $label = $i . '%';
+        if ($i == 100) $label .= ' - Very Calm';
+        if ($i == 50) $label .= ' - Neutral';
+        if ($i == 0) $label .= ' - Totally Panicked';
+    ?>
+      <option value="<?= $i ?>" <?= ($entry['calmness'] == $i) ? 'selected' : '' ?>><?= $label ?></option>
+    <?php endfor; ?>
+  </select>
+</div>
 
       <!-- SL/Target -->
       <div class="col-md-3">

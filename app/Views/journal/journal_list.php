@@ -39,7 +39,7 @@
             <?php endforeach; ?>
           <?php else: ?>
             <tr>
-              <td colspan="16" class="text-center">No journal entries found.</td>
+              <td colspan="4" class="text-center">No journal entries found.</td>
             </tr>
           <?php endif; ?>
         </tbody>

@@ -18,6 +18,38 @@
         <input type="text" name="stock" class="form-control" required>
         <div class="invalid-feedback">Stock name is required.</div>
       </div>
+  <!-- Strategy Type -->
+      <div class="col-md-3">
+        <label for="strategy_type" class="form-label">🎯 Strategy Type</label>
+        <select name="strategy_type" id="strategy_type" class="form-select" required>
+          <option value="" selected disabled>-- Select Strategy --</option>
+          <option value="Breakout">Breakout</option>
+          <option value="Reversal">Reversal</option>
+          <option value="Scalping">Scalping</option>
+          <option value="Range Bound">Range Bound</option>
+          <option value="News Based">News Based</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <!-- Calmness -->
+      <div class="col-md-3">
+        <label for="calmness" class="form-label">😌 Calmness (%)</label>
+        <select name="calmness" id="calmness" class="form-select" required>
+          <option value="" selected disabled>-- How Calm Were You? --</option>
+          <option value="100">100% - Very Calm</option>
+          <option value="90">90%</option>
+          <option value="80">80%</option>
+          <option value="70">70%</option>
+          <option value="60">60%</option>
+          <option value="50">50% - Neutral</option>
+          <option value="40">40%</option>
+          <option value="30">30%</option>
+          <option value="20">20%</option>
+          <option value="10">10%</option>
+          <option value="0">0% - Totally Panicked</option>
+        </select>
+      </div>
 
       <!-- SL/Target -->
       <div class="col-md-3">

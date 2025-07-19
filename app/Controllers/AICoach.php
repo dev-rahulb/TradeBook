@@ -51,17 +51,50 @@ class AICoach extends Controller
 
     // Summarize entries
     $entrySummaries = [];
-    foreach ($journalEntries as $entry) {
-        $entrySummaries[] = "📅 Date: {$entry['date']}
+$entryReasonModel   = new \App\Models\JournalEntryReasonModel();
+$exitReasonModel    = new \App\Models\JournalExitReasonModel();
+$mistakeModel       = new \App\Models\JournalMistakeModel();
+
+foreach ($journalEntries as $entry) {
+    $entryId = $entry['id'];
+
+    // Fetch related reasons and mistakes
+    $entryReasons = $entryReasonModel
+        ->select('entry_reasons.reason')
+        ->join('entry_reasons', 'entry_reasons.id = journal_entry_reasons.reason_id')
+        ->where('journal_id', $entryId)
+        ->findAll();
+
+    $exitReasons = $exitReasonModel
+        ->select('exit_reasons.reason')
+        ->join('exit_reasons', 'exit_reasons.id = journal_exit_reasons.reason_id')
+        ->where('journal_id', $entryId)
+        ->findAll();
+
+    $mistakes = $mistakeModel
+        ->select('mistakes.reason')
+        ->join('mistakes', 'mistakes.id = journal_mistakes.mistake_id')
+        ->where('journal_id', $entryId)
+        ->findAll();
+
+    // Convert to readable strings
+    $entryReasonText = implode(', ', array_column($entryReasons, 'reason'));
+    $exitReasonText  = implode(', ', array_column($exitReasons, 'reason'));
+    $mistakeText     = implode(', ', array_column($mistakes, 'reason'));
+
+    // Compile
+    $entrySummaries[] = "📅 Date: {$entry['date']}
 📈 Stock: {$entry['stock']}
 📊 Strategy: {$entry['strategy_type']}
 😌 Calmness: {$entry['calmness']}
 💰 P&L: ₹{$entry['pnl']}
-📝 Entry Reason: {$entry['entry_reason']}
-🏁 Exit Reason: {$entry['exit_reason']}
-❌ Mistake: {$entry['mistake']}
+📝 Entry Reasons: {$entryReasonText}
+🏁 Exit Reasons: {$exitReasonText}
+❌ Mistakes: {$mistakeText}
 📘 Lesson: {$entry['lessons']}";
-    }
+}
+// echo "<pre>";
+// print_r($entrySummaries);die;
 
     $compiledEntries = implode("\n\n", $entrySummaries);
 

@@ -29,3 +29,8 @@ $routes->get('journal/delete/(:num)', 'Journal::delete/$1');  // Delete entry
 
 
 $routes->get('analytics', 'Dashboard::analytics');
+
+
+$routes->get('journal/calendar', 'Journal::calendar');
+$routes->get('journal/dayView/(:segment)', 'Journal::dayView/$1');
+

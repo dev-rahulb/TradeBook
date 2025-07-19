@@ -105,4 +105,42 @@ class Journal extends BaseController
 
         return redirect()->to('/journal')->with('message', 'Entry deleted successfully.');
     }
+public function calendar()
+{
+    $journalModel = new JournalModel();
+
+    // Fetch journal entries for the logged-in user
+    $entries = $journalModel
+        ->where('user_id', session()->get('user_id'))
+        ->orderBy('date', 'DESC')
+        ->findAll();
+
+    // Prepare events for FullCalendar
+    $events = [];
+
+    foreach ($entries as $entry) {
+        $pnl = $entry['pnl'] ?? 0;
+
+        $events[] = [
+            'title' => '₹' . $pnl,
+            'start' => $entry['date'],
+            'color' => $pnl > 0 ? '#28a745' : ($pnl < 0 ? '#dc3545' : '#ffc107'), // Green = profit, Red = loss, Yellow = 0
+        ];
+    }
+    // Pass events to view
+    return view('journal/calendar', ['calendarEvents' => $events]);
+}
+
+
+public function dayView($date)
+{
+    $model = new JournalModel();
+    $entries = $model->where('date', $date)->findAll();
+
+    return view('journal/day_view', [
+        'date' => $date,
+        'entries' => $entries,
+    ]);
+}
+
 }

@@ -34,3 +34,7 @@ $routes->get('analytics', 'Dashboard::analytics');
 $routes->get('journal/calendar', 'Journal::calendar');
 $routes->get('journal/dayView/(:segment)', 'Journal::dayView/$1');
 
+$routes->get('ai-coach', 'AICoach::index');
+$routes->post('ai-coach/generate', 'AICoach::generate');
+
+$routes->post('ai-coach/delete/(:num)', 'AICoach::delete/$1');

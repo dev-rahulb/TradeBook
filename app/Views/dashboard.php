@@ -1,7 +1,7 @@
 <?= $this->extend('layout/main_layout') ?>
 
 <?= $this->section('content') ?>
-<h2 class="mb-4">👋 Welcome, <?= esc($user_name) ?>!</h2>
+
 
 <div class="row g-4">
   <div class="col-md-3">

@@ -9,13 +9,14 @@
 
   <style>
     body {
-      background-color: #f0f2f5;
+      background-color: #f4f7fa;
       font-family: 'Segoe UI', sans-serif;
+      margin: 0;
     }
 
     .sidebar {
       width: 250px;
-      background: linear-gradient(to bottom, #6c63ff, #7b68ee);
+      background: linear-gradient(to bottom, #1b1f3a, #2c2f5a);
       color: white;
       min-height: 100vh;
       position: fixed;
@@ -27,20 +28,21 @@
     .sidebar a {
       color: #fff;
       display: block;
-      padding: 15px 20px;
+      padding: 14px 20px;
       text-decoration: none;
+      font-weight: 500;
     }
 
     .sidebar a:hover,
     .sidebar a.active {
-      background-color: #5c57d3;
-      border-left: 4px solid #ffd369;
+      background-color: #3a3f70;
+      border-left: 4px solid #ffc107;
     }
 
     .topbar {
       height: 60px;
-      background-color: #ffffff;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      background-color: #fff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
       padding-left: 250px;
       display: flex;
       align-items: center;
@@ -48,7 +50,18 @@
       padding-right: 20px;
       position: sticky;
       top: 0;
-      z-index: 999;
+      z-index: 1000;
+    }
+
+    .topbar .left-content {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      font-weight: 600;
+    }
+
+    .topbar .left-content img {
+      height: 30px;
     }
 
     .main-content {
@@ -58,10 +71,10 @@
 
     @media (max-width: 768px) {
       .sidebar {
-        position: relative;
         width: 100%;
         height: auto;
-        padding-top: 0;
+        position: relative;
+        padding-top: 10px;
       }
 
       .topbar {
@@ -85,3 +98,5 @@
 </div>
 
 <?= view('layout/footer') ?>
+</body>
+</html>

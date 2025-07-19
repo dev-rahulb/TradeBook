@@ -128,6 +128,16 @@ class Auth extends Controller
             'isLoggedIn' => true
         ]);
 
+
+        $slogans = [
+  'Discipline Over Emotion',
+  'Trade with Calm & Clarity',
+  'Every Trade is a Lesson',
+  'Stick to the Plan',
+  'Risk Less, Win More',
+];
+session()->set('slogan', $slogans[array_rand($slogans)]);
+
         return redirect()->to('/dashboard');
     }
 

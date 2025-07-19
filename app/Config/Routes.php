@@ -26,3 +26,6 @@ $routes->post('journal/store', 'Journal::store');         // Handle create form
 $routes->get('journal/edit/(:num)', 'Journal::edit/$1');  // Show edit form
 $routes->post('journal/update/(:num)', 'Journal::update/$1'); // Handle update
 $routes->get('journal/delete/(:num)', 'Journal::delete/$1');  // Delete entry
+
+
+$routes->get('analytics', 'Dashboard::analytics');

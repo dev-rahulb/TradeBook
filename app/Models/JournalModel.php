@@ -23,4 +23,18 @@ class JournalModel extends Model
     protected $useTimestamps = true;
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
+
+    public function getTradeStatsByDay($userId)
+{
+    return $this->select("DAYNAME(date) as day")
+        ->selectCount('id', 'total')
+        ->selectSum('sell_price - buy_price', 'net_pl')
+        ->selectAvg('sell_price - buy_price', 'avg_pl')
+        ->selectSum("CASE WHEN sell_price > buy_price THEN 1 ELSE 0 END", 'wins', false)
+        ->where('user_id', $userId)
+        ->groupBy('day')
+        ->orderBy("FIELD(DAYNAME(date), 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday')", '', false)
+        ->findAll();
+}
+
 }

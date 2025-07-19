@@ -28,7 +28,6 @@ $routes->post('journal/update/(:num)', 'Journal::update/$1'); // Handle update
 $routes->get('journal/delete/(:num)', 'Journal::delete/$1');  // Delete entry
 
 
-$routes->get('analytics', 'Dashboard::analytics');
 
 
 $routes->get('journal/calendar', 'Journal::calendar');
@@ -38,3 +37,4 @@ $routes->get('ai-coach', 'AICoach::index');
 $routes->post('ai-coach/generate', 'AICoach::generate');
 
 $routes->post('ai-coach/delete/(:num)', 'AICoach::delete/$1');
+$routes->get('analytics', 'Analytics::index');

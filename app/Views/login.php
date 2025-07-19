@@ -35,11 +35,14 @@
     <div class="card p-4">
      <h3 class="text-center mb-4">Login to TradeBook</h3>
 
-<?php if (session()->getFlashdata('error')): ?>
-  <div class="alert alert-danger text-center">
-    <?= session()->getFlashdata('error') ?>
-  </div>
+<?php if (session()->getFlashdata('success')): ?>
+  <div class="alert alert-success"><?= session('success') ?></div>
 <?php endif; ?>
+
+<?php if (session()->getFlashdata('error')): ?>
+  <div class="alert alert-danger"><?= session('error') ?></div>
+<?php endif; ?>
+
 
 <form action="<?= base_url('login') ?>" method="post">
 

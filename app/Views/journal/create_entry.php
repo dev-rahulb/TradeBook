@@ -38,7 +38,7 @@
         <label for="trade_type" class="form-label">📊 Trade Type <span class="text-danger">*</span></label>
         <select name="trade_type" id="trade_type" class="form-select" required>
           <option value="" selected disabled>-- Select Type --</option>
-          <option value="Long">Long (Buy First)</option>
+          <option value="Long" selected>Long (Buy First)</option>
           <option value="Short">Short (Sell First)</option>
         </select>
         <div class="invalid-feedback">Please select a trade type.</div>
@@ -46,14 +46,14 @@
 
       <!-- BUY/SELL TIME -->
       <div class="col-md-3">
-        <label for="buy_time" class="form-label">🕒 Buy Time <span class="text-danger">*</span></label>
-        <input type="time" name="buy_time" class="form-control" required>
+        <label for="buy_time" class="form-label">🕒 Buy Time </label>
+        <input type="time" name="buy_time" class="form-control" >
         <div class="invalid-feedback">Buy Time is required.</div>
       </div>
 
       <div class="col-md-3">
-        <label for="sell_time" class="form-label">🕓 Sell Time <span class="text-danger">*</span></label>
-        <input type="time" name="sell_time" class="form-control" required>
+        <label for="sell_time" class="form-label">🕓 Sell Time </label>
+        <input type="time" name="sell_time" class="form-control" >
         <div class="invalid-feedback">Sell Time is required.</div>
       </div>
 

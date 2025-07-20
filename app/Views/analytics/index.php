@@ -30,41 +30,20 @@
       </div>
     </div>
 
-    <div class="col-md-3">
-      <div class="card bg-success text-white border-0 shadow-sm">
-        <div class="card-body text-center">
-          <h5>Total Profit</h5>
-          <h3>₹<?= number_format($totalProfit, 2) ?></h3>
-        </div>
-      </div>
-    </div>
+<?php
+  $pnlClass = $netPnL >= 0 ? 'bg-success text-white' : 'bg-danger text-white';
+?>
 
-    <div class="col-md-3">
-      <div class="card bg-danger text-white border-0 shadow-sm">
-        <div class="card-body text-center">
-          <h5>Total Loss</h5>
-          <h3>₹<?= number_format($totalLoss, 2) ?></h3>
-        </div>
-      </div>
+<div class="col-md-3">
+  <div class="card <?= $pnlClass ?> border-0 shadow-sm">
+    <div class="card-body text-center">
+      <h5>Net P&L</h5>
+      <h3>₹<?= number_format($netPnL, 2) ?></h3>
     </div>
+  </div>
+</div>
 
-    <div class="col-md-3">
-      <div class="card bg-warning text-dark border-0 shadow-sm">
-        <div class="card-body text-center">
-          <h5>Net P&L</h5>
-          <h3>₹<?= number_format($netPnL, 2) ?></h3>
-        </div>
-      </div>
-    </div>
 
-    <div class="col-md-3">
-      <div class="card bg-info text-white border-0 shadow-sm">
-        <div class="card-body text-center">
-          <h5>Average P&L</h5>
-          <h3>₹<?= number_format($averagePnL, 2) ?></h3>
-        </div>
-      </div>
-    </div>
 
     <div class="col-md-3">
       <div class="card bg-secondary text-white border-0 shadow-sm">
@@ -74,35 +53,19 @@
         </div>
       </div>
     </div>
-
-    <div class="col-md-3">
-      <div class="card bg-light border-0 shadow-sm">
-        <div class="card-body text-center">
-          <h5>Avg Duration</h5>
-          <h3><?= $durationStats['avg_minutes'] ?? '-' ?> min</h3>
-          <small>Min: <?= $durationStats['min_minutes'] ?? '-' ?> | Max: <?= $durationStats['max_minutes'] ?? '-' ?></small>
-        </div>
+    
+ <div class="col-md-3">
+    <div class="card border-0 shadow-sm text-white bg-dark h-100">
+      <div class="card-body text-center">
+        <h5 class="card-title">Top Strategy</h6>
+        <h3 class="card-text"><?= esc($topStrategy["strategy"] ?? 'N/A') ?></h5>
       </div>
     </div>
   </div>
-<div class="col-md-4">
-  <div class="card shadow-sm border-0">
-    <div class="card-body">
-      <h6 class="card-title">🏆 Top Strategy</h6>
-      <p class="fs-5 mb-0"><?= esc($topStrategy['strategy'] ?? 'N/A') ?></p>
-      <small class="text-muted">Total P&L: ₹<?= number_format($topStrategy['total_pnl'] ?? 0, 2) ?></small>
-    </div>
+  
   </div>
-</div>
 
-<div class="col-md-4">
-  <div class="card shadow-sm border-0">
-    <div class="card-body">
-      <h6 class="card-title">📊 Avg Risk-Reward</h6>
-      <p class="fs-5 mb-0"><?= esc($avgRiskReward ?? 'N/A') ?></p>
-    </div>
-  </div>
-</div>
+
 
   <!-- Charts -->
   <div class="row g-4 mt-4">
@@ -116,15 +79,7 @@
       </div>
     </div>
 
-    <!-- Strategy Chart -->
-    <div class="col-md-6">
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <h5>📊 Strategy Type Distribution</h5>
-          <canvas id="strategyChart" height="200"></canvas>
-        </div>
-      </div>
-    </div>
+
 
     <!-- Mistake Chart -->
     <div class="col-md-6">
@@ -218,16 +173,7 @@
     }
   });
 
-  new Chart(document.getElementById('strategyChart'), {
-    type: 'pie',
-    data: {
-      labels: <?= json_encode(array_keys($strategyCounts)) ?>,
-      datasets: [{
-        data: <?= json_encode(array_values($strategyCounts)) ?>,
-        backgroundColor: ['#28a745', '#007bff', '#ffc107', '#dc3545', '#6f42c1']
-      }]
-    }
-  });
+
 
   new Chart(document.getElementById('mistakeChart'), {
     type: 'bar',
@@ -241,16 +187,50 @@
     }
   });
 
-  new Chart(document.getElementById('calmnessChart'), {
-    type: 'pie',
-    data: {
-      labels: <?= json_encode(array_keys($calmnessCounts)) ?>,
-      datasets: [{
-        data: <?= json_encode(array_values($calmnessCounts)) ?>,
-        backgroundColor: ['#00bcd4', '#4caf50', '#ff9800', '#f44336']
-      }]
+new Chart(document.getElementById('calmnessChart'), {
+  type: 'line',
+  data: {
+    labels: <?= json_encode(array_keys($calmnessCounts)) ?>,
+    datasets: [{
+      label: 'Calmness Distribution',
+      data: <?= json_encode(array_values($calmnessCounts)) ?>,
+      fill: false,
+      borderColor: '#00bcd4',
+      tension: 0.3,
+      pointBackgroundColor: '#00bcd4',
+      pointBorderColor: '#fff',
+      pointRadius: 5,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: true
+      },
+      title: {
+        display: true,
+        text: 'Calmness Level Over Trades'
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: 'Number of Trades'
+        }
+      },
+      x: {
+        title: {
+          display: true,
+          text: 'Calmness Level'
+        }
+      }
     }
-  });
+  }
+});
+
 
   new Chart(document.getElementById('dayChart'), {
     type: 'bar',

@@ -12,6 +12,8 @@
   <!-- Select2 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 
   <style>
     body {
@@ -124,6 +126,11 @@
 
 <!-- Select2 JS -->
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
 <?= $this->section('scripts') ?>
 <script>
   $(document).ready(function () {
@@ -131,9 +138,10 @@
       placeholder: "Select options",
       allowClear: true
     });
-
+  $('.datatable').DataTable();
     // any other jQuery logic here
   });
+  
 </script>
 <?= $this->endSection() ?>
 <!-- Page-specific JS -->

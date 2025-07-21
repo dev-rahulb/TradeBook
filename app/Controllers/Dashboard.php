@@ -3,7 +3,7 @@
 namespace App\Controllers;
 
 use CodeIgniter\Controller;
-
+use Config\Database;
 class Dashboard extends Controller
 {
    public function index()
@@ -29,6 +29,17 @@ class Dashboard extends Controller
 $totalTrades = $winningTrades + $losingTrades;
 $winRate = $totalTrades > 0 ? round(($winningTrades / $totalTrades) * 100, 2) : 0;
 
+ $db = Database::connect();
+        // Step 12: Top Strategy
+$topStrategy= $db->query("
+    SELECT IFNULL(strategy_type, 'No Strategy') as strategy, SUM(pnl) as total_pnl
+    FROM journal_entries
+    WHERE user_id = ?  
+    GROUP BY strategy
+    ORDER BY total_pnl DESC
+    LIMIT 1
+", [$userId])->getRowArray();
+ $topStrategy=$topStrategy["strategy"];
     // Prepare data
     $data = [
         'title' => 'Dashboard',
@@ -39,6 +50,7 @@ $winRate = $totalTrades > 0 ? round(($winningTrades / $totalTrades) * 100, 2) : 
         'losingTrades' => $losingTrades,
         'recentEntries' => $recentEntries,
         'winRate'=>$winRate,
+        'topStrategy'=>$topStrategy,
     ];
 
     return view('dashboard', $data);

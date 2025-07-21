@@ -39,7 +39,8 @@ $topStrategy= $db->query("
     ORDER BY total_pnl DESC
     LIMIT 1
 ", [$userId])->getRowArray();
- $topStrategy=$topStrategy["strategy"];
+$topStrategy = $topStrategy['strategy'] ?? 'NA';
+
     // Prepare data
     $data = [
         'title' => 'Dashboard',

@@ -37,10 +37,7 @@
                 </td>
               </tr>
             <?php endforeach; ?>
-          <?php else: ?>
-            <tr>
-              <td colspan="4" class="text-center">No journal entries found.</td>
-            </tr>
+       
           <?php endif; ?>
         </tbody>
       </table>

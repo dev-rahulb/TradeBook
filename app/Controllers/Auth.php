@@ -12,7 +12,7 @@ class Auth extends Controller
     }
 
     // Handle Signup Form POST
-   public function signupPost()
+public function signupPost()
 {
     $email    = $this->request->getPost('email');
     $name     = $this->request->getPost('name');
@@ -21,28 +21,51 @@ class Auth extends Controller
     $userModel = new UserModel();
     $existingUser = $userModel->where('email', $email)->first();
 
-    $otp       = rand(100000, 999999);
-    $expiresAt = date('Y-m-d H:i:s', strtotime('+15 minutes'));
+    $otp         = rand(100000, 999999);
+    $expiresAt   = date('Y-m-d H:i:s', strtotime('+15 minutes'));
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-    if ($existingUser) {
+    // ✅ Handle New User Registration
+    if (!$existingUser) {
+        $userModel->insert([
+            'name'           => $name,
+            'email'          => $email,
+            'password'       => $hashedPassword,
+            'otp'            => $otp,
+            'otp_expires_at' => $expiresAt,
+            'is_verified'    => 0,
+            'role'           => 'user'
+        ]);
+
+        // Send OTP
+        $emailService = \Config\Services::email();
+        $emailService->setTo($email);
+        $emailService->setSubject('Your OTP - TradeBook');
+        $emailService->setMessage("Your OTP is <b>$otp</b>. It will expire in 15 minutes.");
+        $emailService->send();
+
+        return redirect()->to('/signup')
+            ->with('showOtpForm', true)
+            ->with('signup_email', $email)
+            ->with('success', 'OTP sent to your email. Please verify your account.');
+    }
+
+    // ✅ Handle Already Registered but Not Verified
     if ($existingUser['is_verified'] == 0) {
-        // Check if existing OTP is still valid (cooldown active)
-        $expiresAt = strtotime($existingUser['otp_expires_at']);
+        $expiresAtTimestamp = strtotime($existingUser['otp_expires_at']);
         $now = time();
 
-        if ($expiresAt > $now) {
-            $minutesLeft = ceil(($expiresAt - $now) / 60);
+        if ($expiresAtTimestamp > $now) {
+            $minutesLeft = ceil(($expiresAtTimestamp - $now) / 60);
             return redirect()->to('/signup')
                 ->with('showOtpForm', true)
                 ->with('signup_email', $email)
                 ->with('error', "OTP already sent. Please wait $minutesLeft minutes before requesting again.");
         }
 
-        // If expired, generate new OTP and update
+        // Generate new OTP and update
         $otp       = rand(100000, 999999);
         $newExpiry = date('Y-m-d H:i:s', strtotime('+15 minutes'));
-        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
         $userModel->update($existingUser['id'], [
             'otp'            => $otp,
@@ -50,22 +73,23 @@ class Auth extends Controller
             'password'       => $hashedPassword
         ]);
 
-        // Send new OTP
-        $emailService = \Config\Services::email();
-        $emailService->setTo($email);
-        $emailService->setSubject('Your New OTP - TradeBook');
-        $emailService->setMessage("Your new OTP is <b>$otp</b>. It will expire in 15 minutes.");
-        $emailService->send();
+            // Send new OTP
+            $emailService = \Config\Services::email();
+            $emailService->setTo($email);
+            $emailService->setSubject('Your New OTP - TradeBook');
+            $emailService->setMessage("Your new OTP is <b>$otp</b>. It will expire in 15 minutes.");
+            $emailService->send();
 
         return redirect()->to('/signup')
             ->with('showOtpForm', true)
             ->with('signup_email', $email)
             ->with('success', 'Your OTP has expired. New OTP sent. Please verify within 15 minutes.');
     }
-    }
-    // Verified user
+
+    // ❌ Already Verified
     return redirect()->back()->with('error', 'Email already registered and verified.');
 }
+
 
 
 
@@ -120,11 +144,15 @@ class Auth extends Controller
         if (!password_verify($password, $user['password'])) {
             return redirect()->back()->with('error', 'Invalid credentials.');
         }
+        if ($user['is_blocked']) {
+            return redirect()->back()->with('error', 'Your account is blocked. Please contact admin.');
+        }
 
         // Login successful — set session
         session()->set([
             'user_id'    => $user['id'],
             'user_name'  => $user['name'],
+            'role' => $user['role'], 
             'isLoggedIn' => true
         ]);
 
@@ -147,4 +175,123 @@ session()->set('slogan', $slogans[array_rand($slogans)]);
         session()->destroy();
         return redirect()->to('/login')->with('success', 'Logged out successfully.');
     }
+
+    public function profile()
+{
+  
+    $userModel = new \App\Models\UserModel();
+    $user = $userModel->find(session()->get('user_id'));
+// print_r($user); // Will show the full array or null
+// die;
+    return view('auth/profile', ['user' => $user]);
+}
+
+public function changePassword()
+{
+    return view('auth/change_password');
+}
+
+public function changePasswordPost()
+{
+    $userId = session()->get('user_id');
+    $userModel = new \App\Models\UserModel();
+    $user = $userModel->find($userId);
+
+    $currentPassword = $this->request->getPost('current_password');
+    $newPassword = $this->request->getPost('new_password');
+    $confirmPassword = $this->request->getPost('confirm_password');
+
+    if (!password_verify($currentPassword, $user['password'])) {
+        return redirect()->back()->with('error', 'Current password is incorrect.');
+    }
+
+    if ($newPassword !== $confirmPassword) {
+        return redirect()->back()->with('error', 'New passwords do not match.');
+    }
+
+    $userModel->update($userId, [
+        'password' => password_hash($newPassword, PASSWORD_DEFAULT),
+    ]);
+
+    return redirect()->to('/profile')->with('success', 'Password changed successfully.');
+}
+public function forgotPassword()
+{
+    return view('auth/forgot_password');
+}
+
+public function forgotPasswordPost()
+{
+    $email = $this->request->getPost('email');
+    $userModel = new \App\Models\UserModel();
+    $user = $userModel->where('email', $email)->first();
+
+    if (!$user) {
+        return redirect()->back()->with('error', 'No account found with this email.');
+    }
+
+    // Check if existing OTP is still valid
+    if (!empty($user['otp']) && !empty($user['otp_expires_at'])) {
+        $now = new \DateTime();
+        $expiry = new \DateTime($user['otp_expires_at']);
+        if ($expiry > $now) {
+            $remaining = $expiry->getTimestamp() - $now->getTimestamp();
+            $minutes = ceil($remaining / 60);
+            return redirect()->back()->with('error', "An OTP was already sent. Please wait $minutes minute(s) before requesting again.");
+        }
+    }
+
+    // Generate new OTP
+    $otp = rand(100000, 999999);
+    $expiresAt = date('Y-m-d H:i:s', strtotime('+15 minutes'));
+
+    $userModel->update($user['id'], [
+        'otp' => $otp,
+        'otp_expires_at' => $expiresAt
+    ]);
+
+    // Send email
+    // $emailService = \Config\Services::email();
+    // $emailService->setTo($email);
+    // $emailService->setSubject('Reset Password OTP - TradeBook');
+    // $emailService->setMessage("Your OTP for resetting password is <b>$otp</b>. It will expire in 15 minutes.");
+    // $emailService->send();
+
+    return redirect()->to('/reset-password')->with('reset_email', $email)->with('success', 'OTP sent to your email.');
+}
+
+
+
+public function resetPasswordForm()
+{
+    return view('auth/reset_password');
+}
+
+public function handleResetPassword()
+{
+   $email    = $this->request->getPost('email');
+    $otp      = $this->request->getPost('otp');
+    $password = $this->request->getPost('password');
+
+    $userModel = new \App\Models\UserModel();
+    $user = $userModel->where('email', $email)->first();
+    if (!$user || $user['otp'] != $otp) {
+        return redirect()->back()->with('error', 'Invalid OTP or email.');
+    }
+
+    $now = time();
+    $expires = strtotime($user['otp_expires_at']);
+    if ($expires < $now) {
+        return redirect()->back()->with('error', 'OTP expired. Try again.');
+    }
+
+    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+    $userModel->update($user['id'], [
+        'password' => $hashedPassword,
+        'otp' => null,
+        'otp_expires_at' => null
+    ]);
+
+    return redirect()->to('/login')->with('success', 'Password reset successfully. You can now log in.');
+}
 }

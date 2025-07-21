@@ -74,6 +74,12 @@
             <button type="submit" class="btn btn-primary">Sign Up</button>
           </div>
         </form>
+
+        <!-- Forgot Password link -->
+<div class="text-center mt-2">
+  <a href="<?= base_url('forgot-password') ?>" class="text-decoration-none">Forgot Password?</a>
+</div>
+
       <?php endif; ?>
 
       <div class="text-center mt-3">

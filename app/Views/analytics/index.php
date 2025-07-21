@@ -91,16 +91,6 @@
       </div>
     </div>
 
-    <!-- Calmness Chart -->
-    <div class="col-md-6">
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <h5>🧘 Calmness Score Distribution</h5>
-          <canvas id="calmnessChart" height="200"></canvas>
-        </div>
-      </div>
-    </div>
-
     <!-- Day of Week Stats -->
     <div class="col-md-6">
       <div class="card shadow-sm">
@@ -187,49 +177,7 @@
     }
   });
 
-new Chart(document.getElementById('calmnessChart'), {
-  type: 'line',
-  data: {
-    labels: <?= json_encode(array_keys($calmnessCounts)) ?>,
-    datasets: [{
-      label: 'Calmness Distribution',
-      data: <?= json_encode(array_values($calmnessCounts)) ?>,
-      fill: false,
-      borderColor: '#00bcd4',
-      tension: 0.3,
-      pointBackgroundColor: '#00bcd4',
-      pointBorderColor: '#fff',
-      pointRadius: 5,
-    }]
-  },
-  options: {
-    responsive: true,
-    plugins: {
-      legend: {
-        display: true
-      },
-      title: {
-        display: true,
-        text: 'Calmness Level Over Trades'
-      }
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        title: {
-          display: true,
-          text: 'Number of Trades'
-        }
-      },
-      x: {
-        title: {
-          display: true,
-          text: 'Calmness Level'
-        }
-      }
-    }
-  }
-});
+
 
 
   new Chart(document.getElementById('dayChart'), {

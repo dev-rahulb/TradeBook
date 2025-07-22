@@ -59,5 +59,32 @@
     <?php endforeach; ?>
   </ul>
 </div>
+<?php if (!empty($fearDays)): ?>
+    <h4 class="mt-4">⚠️ Fear Days (Psychological Triggers)</h4>
+    <div class="row">
+        <?php foreach ($fearDays as $day): ?>
+            <div class="col-md-6 mb-3">
+                <div class="card border-danger shadow-sm">
+                    <div class="card-header bg-danger text-white">
+                        <?= date('D, d M Y', strtotime($day['date'])) ?> - <?= $day['fear_reason'] ?>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Total Trades:</strong> <?= $day['total_trades'] ?></p>
+                        <p><strong>Net P&L:</strong> <span class="text-danger">₹<?= number_format($day['net_pnl'], 2) ?></span></p>
+                        <?php if (!empty($day['unique_mistakes'])): ?>
+                            <p><strong>Mistakes:</strong> <?= implode(', ', $day['unique_mistakes']) ?></p>
+                        <?php endif; ?>
+                        <?php if (!empty($day['lessons'])): ?>
+                            <p><strong>Lessons:</strong> <?= implode('. ', $day['lessons']) ?>.</p>
+                        <?php endif; ?>
+                        <?php if ($day['no_mistake_count']): ?>
+                            <p><em><?= $day['no_mistake_count'] ?> trades had no mistakes logged.</em></p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+<?php endif; ?>
 
 <?= $this->endSection() ?>

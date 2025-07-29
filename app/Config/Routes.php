@@ -43,6 +43,7 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
 
     // Analytics
     $routes->get('analytics', 'Analytics::index');
+$routes->get('analytics/dailyCapitalPnLChart', 'Analytics::dailyCapitalPnLChart');
 
     // AI Coach
     $routes->get('ai-coach', 'AICoach::index');

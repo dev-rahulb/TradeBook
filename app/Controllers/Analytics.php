@@ -100,6 +100,10 @@ class Analytics extends BaseController
             LIMIT 1
         ", [$userId, $startDate, $endDate])->getRowArray();
 
+
+
+
+
         return view('analytics/index', [
             'start_date'           => $startDate,
             'end_date'             => $endDate,
@@ -116,4 +120,65 @@ class Analytics extends BaseController
             'topStrategy'          => $topStrategy,
         ]);
     }
+public function dailyCapitalPnLChart()
+{
+    $db = \Config\Database::connect();
+    $builder = $db->table('journal_entries');
+
+    $userId = session('user_id');
+    $query = $builder
+        ->select("DATE(date) as trade_date, pnl") // Removed buy_price and quantity as they are not needed for P&L graph
+        ->where('user_id', $userId)
+        ->where('deleted_at IS NULL')
+        ->orderBy('date', 'ASC')
+        ->get();
+
+    $rows = $query->getResult();
+
+    $dailyTrades = [];
+
+    // Group by day and calculate daily total P&L and individual P&L values
+    foreach ($rows as $row) {
+        $date = $row->trade_date;
+        $pnl = floatval($row->pnl);
+
+        if (!isset($dailyTrades[$date])) {
+            $dailyTrades[$date] = [
+                'total_pnl' => 0,
+                'pnl_list' => [],
+            ];
+        }
+
+        $dailyTrades[$date]['total_pnl'] += $pnl;
+        $dailyTrades[$date]['pnl_list'][] = $pnl;
+    }
+
+    // Sort dates to ensure chronological order
+    ksort($dailyTrades);
+
+    // Starting cumulative P&L for visualization
+    $cumulativePnL = 0;
+
+    // Prepare chart data
+    $chartData = [];
+
+    foreach ($dailyTrades as $date => $data) {
+        $open = $cumulativePnL;
+        $high = $open + max(array_merge([0], $data['pnl_list'])); // Include 0 for cases where all P&L is negative for a day
+        $low = $open + min(array_merge([0], $data['pnl_list'])); // Include 0 for cases where all P&L is positive for a day
+        $close = $open + $data['total_pnl'];
+
+        $chartData[] = [
+            'x' => $date,
+            'y' => [round($open), round($high), round($low), round($close)],
+            'cumulative_pnl' => round($close) // Add cumulative P&L for the line chart
+        ];
+
+        $cumulativePnL = $close;
+    }
+
+    return $this->response->setJSON($chartData);
+} 
+
+
 }

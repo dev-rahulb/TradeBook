@@ -72,6 +72,7 @@ class Journal extends BaseController
         'strategy_type' => $this->request->getPost('strategy_type'),
         'calmness'      => $this->request->getPost('calmness'),
         'trade_type'    => $this->request->getPost('trade_type'),
+        'self_rating'    => $this->request->getPost('self_rating'),
     ];
 
     $this->journal->save($journalData);
@@ -231,6 +232,7 @@ class Journal extends BaseController
         'strategy_type' => $this->request->getPost('strategy_type'),
         'calmness'      => $this->request->getPost('calmness'),
         'trade_type'    => $this->request->getPost('trade_type'),
+         'self_rating'    => $this->request->getPost('self_rating'),
     ];
 
     $this->journal->update($id, $journalData);

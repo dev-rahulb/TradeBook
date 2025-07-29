@@ -11,12 +11,12 @@ class JournalModel extends Model
     protected $allowedFields = [
         'date', 'stock', 'stop_loss', 'target',
         'buy_time', 'sell_time', 'buy_price', 'sell_price',
-        'quantity', 'qty_of_trades', 'pnl', 'rating',
+        'quantity', 'qty_of_trades', 'pnl', 'self_rating',
         'entry_reason', 'exit_reason', 'mistake', 'lessons', 'user_id','calmness' ,'strategy_type',
     ];
 
     // ✅ Enable soft deletes
-    protected $useSoftDeletes = true;
+    protected $useSoftDeletes = false;
     protected $deletedField  = 'deleted_at';
 
     // Optional: Enable timestamps if you want created_at/updated_at

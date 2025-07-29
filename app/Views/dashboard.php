@@ -41,7 +41,8 @@
     </div>
   </div>
 </div>
-
+ <h5 class="mt-5">📈 Profit/Loss</h5>
+<div id="capitalCandleChart" style="height: 400px;"></div>
 <!-- Activity Feed -->
 <div class="mt-5">
   <h4>📌 Recent Activity</h4>
@@ -86,5 +87,87 @@
         <?php endforeach; ?>
     </div>
 <?php endif; ?>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
+<script>
+fetch("<?= base_url('analytics/dailyCapitalPnLChart') ?>")
+  .then(res => res.json())
+  .then(data => {
+    const candleData = data.map(d => ({
+      x: d.x,
+      y: d.y,
+      cumulative_pnl: d.cumulative_pnl // Attach this for custom tooltip
+    }));
+
+    const cumulativePnLLine = data.map(d => ({
+      x: d.x,
+      y: d.cumulative_pnl
+    }));
+
+    const options = {
+      chart: {
+        type: 'candlestick',
+        height: 350,
+        id: 'candles',
+        toolbar: { autoSelected: 'pan', show: false },
+        animations: { enabled: true }
+      },
+      series: [{
+        name: 'Daily P&L Range',
+        data: candleData
+      }],
+      xaxis: {
+        type: 'category',
+        labels: { rotate: -45 }
+      },
+      yaxis: [{
+        tooltip: { enabled: true }
+      }],
+      tooltip: {
+        custom: function({ series, seriesIndex, dataPointIndex, w }) {
+          const d = candleData[dataPointIndex];
+          const [open, high, low, close] = d.y;
+          return `
+            <div style="padding: 8px;">
+              <strong>Date:</strong> ${d.x}<br/>
+              <strong>Open:</strong> ₹${open}<br/>
+              <strong>High:</strong> ₹${high}<br/>
+              <strong>Low:</strong> ₹${low}<br/>
+              <strong>Close:</strong> ₹${close}<br/>
+              <strong>Net P&L:</strong> ₹${d.cumulative_pnl}
+            </div>`;
+        }
+      }
+    };
+
+    const chart = new ApexCharts(document.querySelector("#capitalCandleChart"), options);
+    chart.render();
+
+    // Add line chart below
+    const lineOptions = {
+      chart: {
+        height: 200,
+        type: 'line',
+        foreColor: '#999'
+      },
+      series: [{
+        name: 'Cumulative P&L',
+        data: cumulativePnLLine
+      }],
+      xaxis: {
+        type: 'category',
+        labels: { rotate: -45 }
+      },
+      stroke: {
+        width: 2,
+        curve: 'smooth'
+      }
+    };
+
+    const lineChart = new ApexCharts(document.createElement("div"), lineOptions);
+    document.querySelector("#capitalCandleChart").appendChild(lineChart.render().containerEl);
+    lineChart.render();
+  });
+
+</script>
 <?= $this->endSection() ?>

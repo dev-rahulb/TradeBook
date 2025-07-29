@@ -149,12 +149,17 @@
     <?php endforeach; ?>
 </div>
 
-      <div class="col-md-6">
+      <div class="col-md-12">
         <label for="lesson" class="form-label">📘 Lessons Learned <span class="text-danger">*</span></label>
         <textarea name="lesson" class="form-control" rows="2" required></textarea>
         <div class="invalid-feedback">Please share the lesson learned.</div>
       </div>
     </div>
+<div class="col-md-3">
+  <label for="self_rating" class="form-label">🌟 Self Rating (1 to 10) <span class="text-danger">*</span></label>
+  <input type="number" name="self_rating" id="self_rating" class="form-control" min="1" max="10" required placeholder="e.g. 7">
+  <div class="invalid-feedback">Please rate this trade between 1 and 10.</div>
+</div>
 
     <!-- BUTTONS -->
     <div class="mt-4">

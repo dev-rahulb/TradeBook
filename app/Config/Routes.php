@@ -53,6 +53,15 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
 $routes->get('change-password', 'Auth::changePassword');
 $routes->post('change-password', 'Auth::changePasswordPost');
 
+
+$routes->get('rules', 'RuleController::index');
+$routes->get('rules/create', 'RuleController::create');
+$routes->post('rules/store', 'RuleController::store');
+$routes->get('rules/edit/(:num)', 'RuleController::edit/$1');
+$routes->post('rules/update/(:num)', 'RuleController::update/$1');
+$routes->post('rules/delete/(:num)', 'RuleController::delete/$1');
+
+
 });
 
 $routes->group('admin', ['filter' => 'auth:admin'], function ($routes) {

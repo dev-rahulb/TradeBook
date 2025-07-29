@@ -135,6 +135,19 @@
           <?php endforeach; ?>
         </select>
       </div>
+<h5 class="mt-4">Rules Followed</h5>
+<div class="row">
+    <?php foreach ($rules as $rule): ?>
+        <div class="col-md-6 mb-2">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="rules_followed[]" value="<?= $rule->id ?>" id="rule_<?= $rule->id ?>">
+                <label class="form-check-label" for="rule_<?= $rule->id ?>">
+                    <?= esc($rule->rule_text) ?>
+                </label>
+            </div>
+        </div>
+    <?php endforeach; ?>
+</div>
 
       <div class="col-md-6">
         <label for="lesson" class="form-label">📘 Lessons Learned <span class="text-danger">*</span></label>

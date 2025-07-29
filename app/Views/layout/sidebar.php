@@ -21,8 +21,12 @@
     <a href="<?= base_url('analytics') ?>" class="<?= current_url() == base_url('analytics') ? 'active' : '' ?>">
         📈 Analytics
     </a>
-
+<!-- 
     <a href="<?= base_url('ai-coach') ?>" class="<?= current_url() == base_url('ai-coach') ? 'active' : '' ?>">
         🧠 AI Coach
-    </a>
+    </a> -->
+    <a href="<?= base_url('rules') ?>" class="<?= current_url() == base_url('rules') ? 'active' : '' ?>">
+    📋 Rules
+</a>
+
 </div>

@@ -33,14 +33,17 @@ class Journal extends BaseController
          $entryModel = new EntryReasonModel();
     $exitModel = new ExitReasonModel();
     $mistakeModel = new MistakeModel();
+    $ruleModel = new \App\Models\RuleModel();
 
     $entryReasons = $entryModel->asObject()->findAll();
     $exitReasons = $exitModel->asObject()->findAll();
     $mistakes = $mistakeModel->asObject()->findAll();
+        $rules = $ruleModel->asObject()->findAll(); 
         return view('journal/create_entry', [
         'entryReasons' => $entryReasons,
         'exitReasons' => $exitReasons,
         'mistakes' => $mistakes,
+         'rules' => $rules,
     ]);
     }
 
@@ -50,6 +53,7 @@ class Journal extends BaseController
     $entryModel   = new \App\Models\JournalEntryReasonModel();
     $exitModel    = new \App\Models\JournalExitReasonModel();
     $mistakeModel = new \App\Models\JournalMistakeModel();
+    $ruleModel    = new \App\Models\JournalEntryRuleModel(); // ✅ add rule model
 
     // Save main journal
     $journalData = [
@@ -106,6 +110,18 @@ class Journal extends BaseController
         }
     }
 
+  // ✅ Save Followed Rules
+    $followedRules = $this->request->getPost('rules_followed');
+    if ($followedRules && is_array($followedRules)) {
+        foreach ($followedRules as $ruleId) {
+            $ruleModel->save([
+                'journal_entry_id' => $journalId,
+                'rule_id'          => $ruleId,
+                'status'           => 'followed'
+            ]);
+        }
+    }
+
     return redirect()->to('/journal')->with('message', 'Entry added successfully.');
 }
 
@@ -158,6 +174,23 @@ class Journal extends BaseController
     $selectedExitReasons = array_column($selectedExitReasons, 'reason_id');
     $selectedMistakes = array_column($selectedMistakes, 'mistake_id');
 
+
+     $ruleModel = new \App\Models\RuleModel();
+    $allRules = $ruleModel->asObject()->where('user_id', null)->orWhere('user_id', session()->get('user_id'))->findAll();
+
+    // ✅ Get rule status (followed/broken) for this journal entry
+    $ruleStatuses = $db->table('journal_entry_rules')
+        ->select('rule_id, status')
+        ->where('journal_entry_id', $id)
+        ->get()
+        ->getResultArray();
+// Format rule status like: [rule_id => 'followed'/'broken']
+    $ruleStatusMap = [];
+    foreach ($ruleStatuses as $rs) {
+        $ruleStatusMap[$rs['rule_id']] = $rs['status'];
+    }
+
+
     return view('journal/edit_entry', [
         'entry' => $entry,
         'entryReasons' => $entryReasons,
@@ -166,6 +199,9 @@ class Journal extends BaseController
         'selectedEntryReasons' => $selectedEntryReasons,
         'selectedExitReasons' => $selectedExitReasons,
         'selectedMistakes' => $selectedMistakes,
+        // 🆕 Rules
+        'allRules'            => $allRules,
+        'ruleStatusMap'       => $ruleStatusMap
     ]);
 }
 
@@ -177,6 +213,7 @@ class Journal extends BaseController
     $entryModel   = new \App\Models\JournalEntryReasonModel();
     $exitModel    = new \App\Models\JournalExitReasonModel();
     $mistakeModel = new \App\Models\JournalMistakeModel();
+    $ruleEntryModel = new \App\Models\JournalEntryRuleModel(); // ✅ Added rule model
 
     // ✅ Update main journal entry
     $journalData = [
@@ -202,6 +239,7 @@ class Journal extends BaseController
     $entryModel->where('journal_id', $id)->delete();
     $exitModel->where('journal_id', $id)->delete();
     $mistakeModel->where('journal_id', $id)->delete();
+    $ruleEntryModel->where('journal_entry_id', $id)->delete(); // ✅ Clear old rule statuses
 
     // 🔁 Save Entry Reasons
     $entryReasons = $this->request->getPost('entry_reason');
@@ -235,6 +273,33 @@ class Journal extends BaseController
             ]);
         }
     }
+// 🔁 RULES logic using checkboxes
+$allRules = (new \App\Models\RuleModel())
+    ->select('id')
+    ->where('user_id', null)
+    ->orWhere('user_id', session()->get('user_id'))
+     ->asObject()
+    ->findAll();
+
+$followedRules = $this->request->getPost('rules_followed'); // array of checked rule IDs
+$followedRules = is_array($followedRules) ? $followedRules : [];
+
+$ruleEntryModel = new \App\Models\JournalEntryRuleModel();
+
+// 🧹 Clear old rule statuses
+$ruleEntryModel->where('journal_entry_id', $id)->delete();
+
+// 🔁 Loop over all rules, save followed or broken
+foreach ($allRules as $rule) {
+    $ruleId = $rule->id;
+    $status = in_array($ruleId, $followedRules) ? 'followed' : 'broken';
+
+    $ruleEntryModel->save([
+        'journal_entry_id' => $id,
+        'rule_id'          => $ruleId,
+        'status'           => $status
+    ]);
+}
 
     return redirect()->to('/journal')->with('message', 'Entry updated successfully.');
 }

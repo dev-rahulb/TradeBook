@@ -251,11 +251,11 @@ public function forgotPasswordPost()
     ]);
 
     // Send email
-    // $emailService = \Config\Services::email();
-    // $emailService->setTo($email);
-    // $emailService->setSubject('Reset Password OTP - TradeBook');
-    // $emailService->setMessage("Your OTP for resetting password is <b>$otp</b>. It will expire in 15 minutes.");
-    // $emailService->send();
+    $emailService = \Config\Services::email();
+    $emailService->setTo($email);
+    $emailService->setSubject('Reset Password OTP - TradeBook');
+    $emailService->setMessage("Your OTP for resetting password is <b>$otp</b>. It will expire in 15 minutes.");
+    $emailService->send();
 
     return redirect()->to('/reset-password')->with('reset_email', $email)->with('success', 'OTP sent to your email.');
 }
